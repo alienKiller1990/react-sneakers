@@ -1,6 +1,7 @@
 import React from 'react'
 
-function Header() {
+function Header({ onClickCart }) {
+    
     return (
         <header className="d-flex justify-between align-center p-40">
             <div className="d-flex align-center">
@@ -12,7 +13,9 @@ function Header() {
             </div>
 
             <ul className="d-flex">
-                <li className="mr-40">
+                <li
+                    onClick={onClickCart}
+                    className="mr-40 cu-p">
                     <img src="/img/cart.svg" alt="cart" width={18} height={18} />
                     <span>1205 руб.</span>
                 </li>

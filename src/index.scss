@@ -37,17 +37,6 @@ header {
   }
 }
 
-
-.button {
-  background: #FFFFFF;
-  border: 1px solid #F2F2F2;
-  box-sizing: border-box;
-  border-radius: 8px;
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
-}
-
 .search-block {
   border: 1px solid #F2F2F2;
   border-radius: 10px;
@@ -82,6 +71,12 @@ header {
   background: #FFFFFF;
   box-shadow: -10px 4px 24px rgba(0, 0, 0, 0.1);
   padding: 30px;
+  // transform: translateX(150%);
+  // transition: transform 0.3s ease-in-out;
+
+  // &.active {
+  //     transform: translateX(0);
+  // }
 
   .items {
     overflow: auto;

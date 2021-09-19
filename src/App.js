@@ -1,19 +1,46 @@
+// import React from "react";
+import React from "react";
 import Card from "./component/Card";
 import Drawer from "./component/Drawer";
 import Header from "./component/Header";
 
-const arr = [
-  { title: 'Мужские Кроссовки Nike Blazer Mid Suede', price: 12999, imgUrl: '/img/sneakers/1.jpg' },
-  { title: 'Мужские Кроссовки Nike Air Max 270', price: 15600, imgUrl: '/img/sneakers/2.jpg' },
-  { title: 'Мужские Кроссовки Nike Blazer Mid Suede', price: 13600, imgUrl: '/img/sneakers/3.jpg' },
-  { title: 'Кроссовки Puma X Aka Boku Future Rider', price: 10000, imgUrl: '/img/sneakers/4.jpg' },
-]
-
 function App() {
+
+  const [items, setItems] = React.useState([]); // хук для карточек с кроссовками
+  const [cartItems, setCartItems] = React.useState([]); // хук для товаров в корзине
+  const [cartOpened, setCartOpened] = React.useState(false) // хук для открытия / закрытия корзины
+
+  React.useEffect(() => { // этот хук следит, если открыта корзина, убираем глобальный скролл
+    const body = document.querySelector('body');
+    body.style.overflow = cartOpened ? 'hidden' : 'auto';
+  }, [cartOpened]);
+
+  React.useEffect( () => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
+    fetch('https://6147374665467e0017384aa5.mockapi.io/items') // делаем запрос на тестовый сервер
+      .then(res => {
+        return res.json(); // получаем ответ в виде объекта и вызываем его метод "json" для получения "items"
+      })
+      .then(json => {
+        setItems(json) // при помощи хука рендерим "items"
+      })
+  },[]);
+  
+  const onAddToCart = (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
+    setCartItems(prev => [...prev, obj])
+  };
+
+
   return (
     <div className="wrapper clear">
-      <Drawer />
-      <Header />
+      {
+        cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
+          onClose={() => setCartOpened(false)}
+          items={cartItems} />
+      }
+
+      <Header
+        onClickCart={() => setCartOpened(true)}
+      />
       <div className="content p-40">
         <div className="d-flex align-center justify-between mb-40">
           <h1>Все кроссовки</h1>
@@ -23,15 +50,16 @@ function App() {
           </div>
         </div>
 
-        <div className="d-flex">
+        <div className="d-flex flex-wrap">
           {
-            arr.map((val, id) => (
+            items.map((item, id) => (
               <Card
-                onClickButton={() => console.log(val)}
-                title={val.title}
-                price={val.price}
-                imgUrl={val.imgUrl}
-                key={`${val.title}_${id}`} />
+                onPlus={(obj) => onAddToCart(obj)}
+                onFavorite={() => console.log('Добавили в закладки')}
+                title={item.title}
+                price={item.price}
+                imgUrl={item.imgUrl}
+                key={`${item.title}_${id}`} />
             ))
           }
         </div>
