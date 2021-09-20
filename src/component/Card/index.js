@@ -1,13 +1,21 @@
 import React from 'react';
 import styles from './Card.module.scss';
 
-function Card({ title, price, imgUrl, onPlus, onFavorite }) {
+function Card({ title, price, imgUrl, onPlus, onFavorite}) {
 
     const [isAdded, setIsAdded] = React.useState(false); // хук для смены иконки добавить в корзину / убрать из корзины
+    const [isFavorite, setIsFavorite] = React.useState(false) // хук для смены иконки добавить в ибранное / убрать
 
     const onClickPlus = () => { // при клике на "img" запускаем "onPlus" из пропсов, и хук "setIsAdded" 
-        onPlus({ title, price, imgUrl}) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
+        if (!isAdded) {
+            onPlus({ title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
+        }
+
         setIsAdded(!isAdded)
+    }
+
+    const onClickFavorite = () => {
+        setIsFavorite(!isFavorite)
     }
 
 
@@ -16,7 +24,10 @@ function Card({ title, price, imgUrl, onPlus, onFavorite }) {
             <div
                 onClick={onFavorite}
                 className={styles.favorite}>
-                <img src="/img/heart-unliked.svg" alt="heart-unliked" />
+                <img
+                    src={isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"}
+                    onClick={onClickFavorite}
+                    alt="heart-unliked" />
             </div>
             <img
                 src={imgUrl}
