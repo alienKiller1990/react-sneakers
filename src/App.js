@@ -1,6 +1,7 @@
 // import React from "react";
 import axios from "axios";
 import React from "react";
+import { Route } from "react-router-dom";
 import Card from "./component/Card";
 import Drawer from "./component/Drawer";
 import Header from "./component/Header";
@@ -19,13 +20,6 @@ function App() {
   }, [cartOpened]);
 
   React.useEffect(() => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
-    // fetch('https://6147374665467e0017384aa5.mockapi.io/items') // делаем запрос на тестовый сервер
-    //   .then(res => {
-    //     return res.json(); // получаем ответ в виде объекта и вызываем его метод "json" для получения "items"
-    //   })
-    //   .then(json => {
-    //     setItems(json) // при помощи хука рендерим "items"
-    //   })
     axios.get('https://6147374665467e0017384aa5.mockapi.io/items') // то же самое, что и "fetch"
       .then(res => setItems(res.data));
 
@@ -38,14 +32,14 @@ function App() {
     setCartItems(prev => [...prev, obj])
   };
 
-  const omPemoveItem = (id) => {
-    axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${id}`) // при удалении товара , удалить с сервера
-    setCartItems(prev => prev.filter(item => item.id !== id))
-  }
-
   const onAddToFavorite = (obj) => {
     axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)
     setFavorites(prev => [...prev, obj])
+  }
+  
+  const omRemoveItem = (id) => {
+    axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${id}`) // при удалении товара , удалить с сервера
+    setCartItems(prev => prev.filter(item => item.id !== id))
   }
 
   const onChangeSearchInput = (event) => { // елси input изменится, отловить событие, и обновить state
@@ -57,10 +51,12 @@ function App() {
     <div className="wrapper clear">
       {
         cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
-          onRemove={omPemoveItem}
+          onRemove={omRemoveItem}
           onClose={() => setCartOpened(false)}
           items={cartItems} />
       }
+
+      <Route path="/test">11111111111111111111</Route>
 
       <Header
         onClickCart={() => setCartOpened(true)}

@@ -10,11 +10,11 @@ function Card({ title, price, imgUrl, onPlus, onFavorite}) {
         if (!isAdded) {
             onPlus({ title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
         }
-
         setIsAdded(!isAdded)
     }
 
     const onClickFavorite = () => {
+        onFavorite({ title, price, imgUrl })
         setIsFavorite(!isFavorite)
     }
 
@@ -22,7 +22,6 @@ function Card({ title, price, imgUrl, onPlus, onFavorite}) {
     return (
         <div className={styles.card}>
             <div
-                onClick={onFavorite}
                 className={styles.favorite}>
                 <img
                     src={isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"}
