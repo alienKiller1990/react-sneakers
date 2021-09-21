@@ -2,9 +2,10 @@
 import axios from "axios";
 import React from "react";
 import { Route } from "react-router-dom";
-import Card from "./component/Card";
 import Drawer from "./component/Drawer";
 import Header from "./component/Header";
+import Favorites from "./pages/Favorites";
+import Home from "./pages/Home";
 
 function App() {
 
@@ -25,6 +26,9 @@ function App() {
 
     axios.get('https://6147374665467e0017384aa5.mockapi.io/cart') // запрашиваем "cart" с сервера и рендерим корзину
       .then(res => setCartItems(res.data));
+
+    axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites') // запрашиваем "cart" с сервера и рендерим корзину
+      .then(res => setFavorites(res.data));
   }, []);
 
   const onAddToCart = (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
@@ -32,11 +36,20 @@ function App() {
     setCartItems(prev => [...prev, obj])
   };
 
-  const onAddToFavorite = (obj) => {
-    axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)
-    setFavorites(prev => [...prev, obj])
+  const onAddToFavorite = async (obj) => {
+    try {
+      if (favorites.find(favObj => favObj.id === obj.id)) { // если в стайте "favorites" есть объект с "id" таким же как у объекта по которому совершили клик
+        axios.delete(`https://6147374665467e0017384aa5.mockapi.io/favorites/${obj.id}`);// отправь запрос на удаление
+        // setFavorites(prev => prev.filter(item => item.id !== obj.id))// перебрать стэйт и убрать из него объект, "id" которого, равен "obj.id"
+      } else {
+        const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)// дождись ответа
+        setFavorites(prev => [...prev, data])
+      }
+    } catch (error){
+      alert('Не удалось добавить в фавориты')
+    }
   }
-  
+
   const omRemoveItem = (id) => {
     axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${id}`) // при удалении товара , удалить с сервера
     setCartItems(prev => prev.filter(item => item.id !== id))
@@ -55,47 +68,25 @@ function App() {
           onClose={() => setCartOpened(false)}
           items={cartItems} />
       }
+      <Header onClickCart={() => setCartOpened(true)} />
 
-      <Route path="/test">11111111111111111111</Route>
+      <Route path="/" exact>
+        <Home
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+          onChangeSearchInput={onChangeSearchInput}
+          items={items}
+          onAddToCart={onAddToCart}
+          onAddToFavorite={onAddToFavorite}
+        />
+      </Route>
+      <Route path="/favorites" exact>
+        <Favorites
+          onAddToFavorite={onAddToFavorite}
+          items={favorites} />
+      </Route>
 
-      <Header
-        onClickCart={() => setCartOpened(true)}
-      />
-      <div className="content p-40">
-        <div className="d-flex align-center justify-between mb-40">
-          <h1>{searchValue ? `Поиск по запросу: "${searchValue}"` : 'Все кроссовки'}</h1>
-          <div className="search-block d-flex">
-            <img src="/img/search.svg" alt="Search" />
-            {
-              searchValue && <img // Если "seacrhValue" существует отобрази кнопку "clear"
-                onClick={() => setSearchValue('')} // по клику на кнопку очистить state
-                className="clear cu-p"
-                src="/img/button-remove.svg"
-                alt="Clear" />
-            }
-            <input // контролируемый input т.к. в свойстве value значение из state
-              onChange={onChangeSearchInput}
-              placeholder="Поиск..."
-              value={searchValue} />
-          </div>
-        </div>
 
-        <div className="d-flex flex-wrap">
-          {
-            items
-              .filter(item => item.title.toLowerCase().includes(searchValue.toLowerCase())) // покажи те карточки, в которых присутствует "searchValue"
-              .map((item, id) => (
-                <Card
-                  onPlus={(obj) => onAddToCart(obj)}
-                  onFavorite={(obj) => onAddToFavorite(obj)}
-                  title={item.title}
-                  price={item.price}
-                  imgUrl={item.imgUrl}
-                  key={`${item.title}_${id}`} />
-              ))
-          }
-        </div>
-      </div>
     </div>
   )
 }

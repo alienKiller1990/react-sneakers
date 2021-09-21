@@ -24,7 +24,7 @@ function Header({ onClickCart }) {
                     <span>1205 руб.</span>
                 </li>
                 <li>
-                    <Link to="/test">
+                    <Link to="/favorites">
                         <img className="mr-30" src="/img/heart.svg" alt="cart" width={18} height={18} />
                     </Link>
                 </li>
