@@ -32,20 +32,32 @@ function App() {
   }, []);
 
   const onAddToCart = (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
-    axios.post('https://6147374665467e0017384aa5.mockapi.io/cart', obj) // при добавлении товара в корзину отправить "obj" на сервер
-    setCartItems(prev => [...prev, obj])
+    try {
+      if (cartItems.find(item => Number(item.id) === Number(obj.id))) {// если в "cartItems" есть хотя бы один "item" имеет такой "id", который был при нажатии на кнопку "plus", то удалить продукт
+        axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${obj.id}`)
+        setCartItems(prev => prev.filter(item => Number(item.id) !== Number(obj.id)))
+      } else {
+        axios.post('https://6147374665467e0017384aa5.mockapi.io/cart', obj) // при добавлении товара в корзину отправить "obj" на сервер
+        setCartItems(prev => [...prev, obj])
+
+      }
+    } catch (error) {
+
+    }
+
+
   };
 
   const onAddToFavorite = async (obj) => {
     try {
-      if (favorites.find(favObj => favObj.id === obj.id)) { // если в стайте "favorites" есть объект с "id" таким же как у объекта по которому совершили клик
+      if (favorites.find(favObj => favObj.id === obj.id)) { // если в стэйте "favorites" есть объект с "id" таким же как у объекта по которому совершили клик
         axios.delete(`https://6147374665467e0017384aa5.mockapi.io/favorites/${obj.id}`);// отправь запрос на удаление
-        // setFavorites(prev => prev.filter(item => item.id !== obj.id))// перебрать стэйт и убрать из него объект, "id" которого, равен "obj.id"
+        // setFavorites(prev => prev.filter(item => item.id !== obj.id))//  перебрать стэйт и убрать из него объект, "id" которого, равен "obj.id"
       } else {
-        const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)// дождись ответа
+        const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)// дождись ответа, чтобы получить и использовать новые данные а не старые
         setFavorites(prev => [...prev, data])
       }
-    } catch (error){
+    } catch (error) {
       alert('Не удалось добавить в фавориты')
     }
   }
@@ -72,6 +84,7 @@ function App() {
 
       <Route path="/" exact>
         <Home
+          cartItems={cartItems}
           searchValue={searchValue}
           setSearchValue={setSearchValue}
           onChangeSearchInput={onChangeSearchInput}

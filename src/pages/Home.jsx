@@ -2,7 +2,7 @@ import React from 'react'
 import Card from "../component/Card";
 
 
-function Home({ searchValue, setSearchValue, onChangeSearchInput, items, onAddToCart, onAddToFavorite, }) {
+function Home({ searchValue, setSearchValue, onChangeSearchInput, items, onAddToCart, onAddToFavorite, cartItems }) {
     return (
         <div className="content p-40">
             <div className="d-flex align-center justify-between mb-40">
@@ -32,6 +32,7 @@ function Home({ searchValue, setSearchValue, onChangeSearchInput, items, onAddTo
                                 onPlus={(obj) => onAddToCart(obj)}
                                 onFavorite={(obj) => onAddToFavorite(obj)}
                                 key={`${item.title}_${id}`}
+                                added={cartItems.some(obj => Number(obj.id) === Number(item.id))}
                                 {...item}
                             />
                         ))

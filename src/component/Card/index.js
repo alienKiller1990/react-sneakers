@@ -1,15 +1,13 @@
 import React from 'react';
 import styles from './Card.module.scss';
 
-function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false}) {
+function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false, added = false }) {
 
-    const [isAdded, setIsAdded] = React.useState(false); // хук для смены иконки добавить в корзину / убрать из корзины
+    const [isAdded, setIsAdded] = React.useState(added); // хук для смены иконки добавить в корзину / убрать из корзины
     const [isFavorite, setIsFavorite] = React.useState(favorited) // хук для смены иконки добавить в ибранное / убрать
 
     const onClickPlus = () => { // при клике на "img" запускаем "onPlus" из пропсов, и хук "setIsAdded" 
-        if (!isAdded) {
-            onPlus({ title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
-        }
+        onPlus({ id, title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
         setIsAdded(!isAdded)
     }
 
