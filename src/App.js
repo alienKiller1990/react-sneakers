@@ -21,14 +21,18 @@ function App() {
   }, [cartOpened]);
 
   React.useEffect(() => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
-    axios.get('https://6147374665467e0017384aa5.mockapi.io/items') // то же самое, что и "fetch"
-      .then(res => setItems(res.data));
+    async function fetchData() {
+      const cartResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/cart');
+      const favoritesResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites'); // запрашиваем "cart" с сервера и рендерим корзину
+      const itemsResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/items');
 
-    axios.get('https://6147374665467e0017384aa5.mockapi.io/cart') // запрашиваем "cart" с сервера и рендерим корзину
-      .then(res => setCartItems(res.data));
+      setCartItems(cartResponse.data);
+      setFavorites(favoritesResponse.data);
+      setItems(itemsResponse.data);
+    }
 
-    axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites') // запрашиваем "cart" с сервера и рендерим корзину
-      .then(res => setFavorites(res.data));
+    fetchData()
+
   }, []);
 
   const onAddToCart = (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
