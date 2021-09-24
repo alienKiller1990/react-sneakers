@@ -14,6 +14,7 @@ function App() {
   const [favorites, setFavorites] = React.useState([]); // хук для товаров в избранное
   const [searchValue, setSearchValue] = React.useState(''); // хук для поиска товаров
   const [cartOpened, setCartOpened] = React.useState(false) // хук для открытия / закрытия корзины
+  const [isLoading, setIsLoading] = React.useState(true) 
 
   React.useEffect(() => { // этот хук следит, если открыта корзина, убираем глобальный скролл
     const body = document.querySelector('body');
@@ -21,11 +22,14 @@ function App() {
   }, [cartOpened]);
 
   React.useEffect(() => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
+    
     async function fetchData() {
+      setIsLoading(true)
       const cartResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/cart');
       const favoritesResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites'); // запрашиваем "cart" с сервера и рендерим корзину
       const itemsResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/items');
 
+      setIsLoading(false)
       setCartItems(cartResponse.data);
       setFavorites(favoritesResponse.data);
       setItems(itemsResponse.data);
@@ -95,6 +99,7 @@ function App() {
           items={items}
           onAddToCart={onAddToCart}
           onAddToFavorite={onAddToFavorite}
+          isLoading={isLoading}
         />
       </Route>
       <Route path="/favorites" exact>
