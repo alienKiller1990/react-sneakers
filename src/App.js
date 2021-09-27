@@ -1,4 +1,3 @@
-// import React from "react";
 import axios from "axios";
 import React from "react";
 import { Route } from "react-router-dom";
@@ -7,6 +6,8 @@ import Header from "./component/Header";
 import Favorites from "./pages/Favorites";
 import Home from "./pages/Home";
 
+export const AppContext = React.createContext({});
+
 function App() {
 
   const [items, setItems] = React.useState([]); // хук для карточек с кроссовками
@@ -14,7 +15,7 @@ function App() {
   const [favorites, setFavorites] = React.useState([]); // хук для товаров в избранное
   const [searchValue, setSearchValue] = React.useState(''); // хук для поиска товаров
   const [cartOpened, setCartOpened] = React.useState(false) // хук для открытия / закрытия корзины
-  const [isLoading, setIsLoading] = React.useState(true) 
+  const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => { // этот хук следит, если открыта корзина, убираем глобальный скролл
     const body = document.querySelector('body');
@@ -22,7 +23,7 @@ function App() {
   }, [cartOpened]);
 
   React.useEffect(() => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
-    
+
     async function fetchData() {
       setIsLoading(true)
       const cartResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/cart');
@@ -81,35 +82,37 @@ function App() {
 
 
   return (
-    <div className="wrapper clear">
-      {
-        cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
-          onRemove={omRemoveItem}
-          onClose={() => setCartOpened(false)}
-          items={cartItems} />
-      }
-      <Header onClickCart={() => setCartOpened(true)} />
+    <AppContext.Provider value={{ items, favorites, cartItems }}>
+      <div className="wrapper clear">
+        {
+          cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
+            onRemove={omRemoveItem}
+            onClose={() => setCartOpened(false)}
+            items={cartItems} />
+        }
+        <Header onClickCart={() => setCartOpened(true)} />
 
-      <Route path="/" exact>
-        <Home
-          cartItems={cartItems}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onChangeSearchInput={onChangeSearchInput}
-          items={items}
-          onAddToCart={onAddToCart}
-          onAddToFavorite={onAddToFavorite}
-          isLoading={isLoading}
-        />
-      </Route>
-      <Route path="/favorites" exact>
-        <Favorites
-          onAddToFavorite={onAddToFavorite}
-          items={favorites} />
-      </Route>
+        <Route path="/" exact>
+          <Home
+            cartItems={cartItems}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+            onChangeSearchInput={onChangeSearchInput}
+            items={items}
+            onAddToCart={onAddToCart}
+            onAddToFavorite={onAddToFavorite}
+            isLoading={isLoading}
+          />
+        </Route>
+        <Route path="/favorites" exact>
+          <Favorites
+            onAddToFavorite={onAddToFavorite}
+          />
+        </Route>
 
 
-    </div>
+      </div>
+    </AppContext.Provider>
   )
 }
 
