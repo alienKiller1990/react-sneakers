@@ -1,6 +1,16 @@
 import React from 'react'
+import { AppContext } from '../App';
+import Info from './Info'
 
 function Drawer({ onClose, items = [], onRemove }) {
+    const [isOrderComplete, setIsOrderComplete] = React.useState(false);
+    const { setCartItems} = React.useContext(AppContext)
+
+    const onClickOrder = () => {
+        setIsOrderComplete(true);
+        setCartItems([])
+    }
+
     return (
         <div className="overlay">
 
@@ -50,26 +60,30 @@ function Drawer({ onClose, items = [], onRemove }) {
                                         <b>1074 руб. </b>
                                     </li>
                                 </ul>
-                                <button className="greenButton">
+                                <button onClick={onClickOrder} className="greenButton">
                                     Оформить заказ
                                     <img src="/img/arrow-right.svg" alt="arrow" />
                                 </button>
                             </div>
                         </div>
                         :
-                        <div className="cartEmpty d-flex align-center justify-center flex-column flex">
-                            <img className="mb-20" width={120} height={120} src="/img/empty-cart.jpg" alt="Empty" />
-                            <h2>Корзина пустая</h2>
-                            <p className="opacity-6">
-                                Добавьте хотя бы пару кроссовок, чтобы сделать заказ.
-                            </p>
-                            <button
-                                onClick={onClose}
-                                className="greenButton">
-                                <img src="/img/arrow-right.svg" alt="Arrow" />
-                                Вернуться назад
-                            </button>
-                        </div>
+                        <Info
+                         title="Корзина пустая"
+                         description="Добавьте хотя бы пару кроссовок, чтобы сделать заказ."
+                         image="/img/empty-cart.jpg"/>
+                        // <div className="cartEmpty d-flex align-center justify-center flex-column flex">
+                        //     <img className="mb-20" width={120} height={120} src="/img/empty-cart.jpg" alt="Empty" />
+                        //     <h2>Корзина пустая</h2>
+                        //     <p className="opacity-6">
+                        //         Добавьте хотя бы пару кроссовок, чтобы сделать заказ.
+                        //     </p>
+                        //     <button
+                        //         onClick={onClose}
+                        //         className="greenButton">
+                        //         <img src="/img/arrow-right.svg" alt="Arrow" />
+                        //         Вернуться назад
+                        //     </button>
+                        // </div>
                 }
 
             </div>

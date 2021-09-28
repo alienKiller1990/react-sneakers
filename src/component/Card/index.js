@@ -1,21 +1,25 @@
 import React from 'react';
 import styles from './Card.module.scss';
 import ContentLoader from "react-content-loader"
+import { AppContext } from '../../App'
 
-function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false, added = false, loading = false }) {
 
-    const [isAdded, setIsAdded] = React.useState(added); // хук для смены иконки добавить в корзину / убрать из корзины
+function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false, loading = false }) {
+
+    const { isItemsAdded } = React.useContext(AppContext);
+    // const [isAdded, setIsAdded] = React.useState(added); // хук для смены иконки добавить в корзину / убрать из корзины
     const [isFavorite, setIsFavorite] = React.useState(favorited) // хук для смены иконки добавить в ибранное / убрать
 
     const onClickPlus = () => { // при клике на "img" запускаем "onPlus" из пропсов, и хук "setIsAdded" 
         onPlus({ id, title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
-        setIsAdded(!isAdded)
+        // setIsAdded(!isAdded)
     }
 
     const onClickFavorite = () => {
         onFavorite({ id, title, price, imgUrl })
         setIsFavorite(!isFavorite)
     }
+
 
 
     return (
@@ -61,7 +65,7 @@ function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false,
                             <img
                                 className={styles.plus}
                                 onClick={onClickPlus}
-                                src={isAdded ? "/img/button-checked.svg" : "/img/button-plus.svg"}
+                                src={isItemsAdded(id) ? "/img/button-checked.svg" : "/img/button-plus.svg"}
                                 alt="Plus"
                             />
                         </div>

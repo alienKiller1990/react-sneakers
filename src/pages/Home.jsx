@@ -9,18 +9,17 @@ function Home({
     onAddToCart,
     onAddToFavorite,
     cartItems,
-    isLoading
+    isLoading,
 }) {
 
     const renderItems = () => {
         const filtredItems = items.filter(item => item.title.toLowerCase().includes(searchValue.toLowerCase()));
         
-        return (isLoading ? [...Array(10)] : filtredItems).map((item, id) => (
+        return (isLoading ? [...Array(10)] : filtredItems).map((item, index) => (
             <Card
                 onPlus={(obj) => onAddToCart(obj)}
                 onFavorite={(obj) => onAddToFavorite(obj)}
-                key={`${id}`}
-                added={cartItems.some(obj => Number(obj.id) === Number(item.id))}
+                key={`${index}`}
                 loading={isLoading}
                 {...item}
             />

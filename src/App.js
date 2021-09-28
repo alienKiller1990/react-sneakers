@@ -61,7 +61,7 @@ function App() {
     try {
       if (favorites.find(favObj => favObj.id === obj.id)) { // если в стэйте "favorites" есть объект с "id" таким же как у объекта по которому совершили клик
         axios.delete(`https://6147374665467e0017384aa5.mockapi.io/favorites/${obj.id}`);// отправь запрос на удаление
-        // setFavorites(prev => prev.filter(item => item.id !== obj.id))//  перебрать стэйт и убрать из него объект, "id" которого, равен "obj.id"
+        setFavorites(prev => prev.filter(item => Number(item.id) !== Number(obj.id)))//  перебрать стэйт и убрать из него объект, "id" которого, равен "obj.id"
       } else {
         const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/favorites', obj)// дождись ответа, чтобы получить и использовать новые данные а не старые
         setFavorites(prev => [...prev, data])
@@ -80,9 +80,12 @@ function App() {
     setSearchValue(event.target.value)
   }
 
+  const isItemsAdded = (id) => {
+    return cartItems.some(obj => Number(obj.id) === Number(id))
+  }
 
   return (
-    <AppContext.Provider value={{ items, favorites, cartItems }}>
+    <AppContext.Provider value={{ items, favorites, cartItems, isItemsAdded, onAddToFavorite, setCartOpened, setCartItems }}>
       <div className="wrapper clear">
         {
           cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
@@ -105,9 +108,7 @@ function App() {
           />
         </Route>
         <Route path="/favorites" exact>
-          <Favorites
-            onAddToFavorite={onAddToFavorite}
-          />
+          <Favorites/>
         </Route>
 
 
