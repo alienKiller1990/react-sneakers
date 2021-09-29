@@ -10,19 +10,21 @@ function Drawer({ onClose, items = [], onRemove }) {
     const [orderId, setOrderId] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const { cartItems, setCartItems } = React.useContext(AppContext)
+    const { cartItems, setCartItems } = React.useContext(AppContext);
+    const totalPrice = cartItems.reduce((sum, obj) => obj.price + sum, 0);
+
 
     const onClickOrder = async () => {
         try {
             setIsLoading(true)
-            const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/order',{
+            const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/order', {
                 items: cartItems
             });
-            
+
             setOrderId(data.id)
             setIsOrderComplete(true);
             setCartItems([]);
-            
+
             for (let i = 0; i < cartItems.length; i++) {
                 const item = cartItems[i];
                 await axios.delete('https://6147374665467e0017384aa5.mockapi.io/cart/' + item.id);
@@ -76,12 +78,12 @@ function Drawer({ onClose, items = [], onRemove }) {
                                     <li className="d-flex">
                                         <span>Итого:</span>
                                         <div></div>
-                                        <b>21 498 руб. </b>
+                                        <b>{totalPrice} руб. </b>
                                     </li>
                                     <li className="d-flex">
                                         <span>Налог 5%:</span>
                                         <div></div>
-                                        <b>1074 руб. </b>
+                                        <b>{totalPrice / 100 * 5} руб. </b>
                                     </li>
                                 </ul>
                                 <button disabled={isLoading} onClick={onClickOrder} className="greenButton">
@@ -96,20 +98,8 @@ function Drawer({ onClose, items = [], onRemove }) {
                             description={isOrderComplete
                                 ? `Ваш заказ ${orderId} скоро будет передан курьерской доставке`
                                 : "Добавьте хотя бы пару кроссовок, чтобы сделать заказ."}
-                            image={isOrderComplete ? "/img/complete-order.jpg" : "/img/empty-cart.jpg" }/>
-                    // <div className="cartEmpty d-flex align-center justify-center flex-column flex">
-                    //     <img className="mb-20" width={120} height={120} src="/img/empty-cart.jpg" alt="Empty" />
-                    //     <h2>Корзина пустая</h2>
-                    //     <p className="opacity-6">
-                    //         Добавьте хотя бы пару кроссовок, чтобы сделать заказ.
-                    //     </p>
-                    //     <button
-                    //         onClick={onClose}
-                    //         className="greenButton">
-                    //         <img src="/img/arrow-right.svg" alt="Arrow" />
-                    //         Вернуться назад
-                    //     </button>
-                    // </div>
+                            image={isOrderComplete ? "/img/complete-order.jpg" : "/img/empty-cart.jpg"} />
+
                 }
 
             </div>
