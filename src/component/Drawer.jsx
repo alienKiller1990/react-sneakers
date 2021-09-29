@@ -1,14 +1,38 @@
+import axios from 'axios';
 import React from 'react'
 import { AppContext } from '../App';
-import Info from './Info'
+import Info from './Info';
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 function Drawer({ onClose, items = [], onRemove }) {
-    const [isOrderComplete, setIsOrderComplete] = React.useState(false);
-    const { setCartItems} = React.useContext(AppContext)
+    const [isOrderComplete, setIsOrderComplete] = React.useState(false);// товар заказан ?
+    const [orderId, setOrderId] = React.useState(null);
+    const [isLoading, setIsLoading] = React.useState(false);
 
-    const onClickOrder = () => {
-        setIsOrderComplete(true);
-        setCartItems([])
+    const { cartItems, setCartItems } = React.useContext(AppContext)
+
+    const onClickOrder = async () => {
+        try {
+            setIsLoading(true)
+            const { data } = await axios.post('https://6147374665467e0017384aa5.mockapi.io/order',{
+                items: cartItems
+            });
+            
+            setOrderId(data.id)
+            setIsOrderComplete(true);
+            setCartItems([]);
+            
+            for (let i = 0; i < cartItems.length; i++) {
+                const item = cartItems[i];
+                await axios.delete('https://6147374665467e0017384aa5.mockapi.io/cart/' + item.id);
+                await delay(1000)
+            }
+
+        } catch (error) {
+            alert('Не удалось создать заказ :(')
+        }
+        setIsLoading(false)
     }
 
     return (
@@ -60,7 +84,7 @@ function Drawer({ onClose, items = [], onRemove }) {
                                         <b>1074 руб. </b>
                                     </li>
                                 </ul>
-                                <button onClick={onClickOrder} className="greenButton">
+                                <button disabled={isLoading} onClick={onClickOrder} className="greenButton">
                                     Оформить заказ
                                     <img src="/img/arrow-right.svg" alt="arrow" />
                                 </button>
@@ -68,22 +92,24 @@ function Drawer({ onClose, items = [], onRemove }) {
                         </div>
                         :
                         <Info
-                         title="Корзина пустая"
-                         description="Добавьте хотя бы пару кроссовок, чтобы сделать заказ."
-                         image="/img/empty-cart.jpg"/>
-                        // <div className="cartEmpty d-flex align-center justify-center flex-column flex">
-                        //     <img className="mb-20" width={120} height={120} src="/img/empty-cart.jpg" alt="Empty" />
-                        //     <h2>Корзина пустая</h2>
-                        //     <p className="opacity-6">
-                        //         Добавьте хотя бы пару кроссовок, чтобы сделать заказ.
-                        //     </p>
-                        //     <button
-                        //         onClick={onClose}
-                        //         className="greenButton">
-                        //         <img src="/img/arrow-right.svg" alt="Arrow" />
-                        //         Вернуться назад
-                        //     </button>
-                        // </div>
+                            title={isOrderComplete ? "Заказ оформлен!" : "Корзина пустая"}
+                            description={isOrderComplete
+                                ? `Ваш заказ ${orderId} скоро будет передан курьерской доставке`
+                                : "Добавьте хотя бы пару кроссовок, чтобы сделать заказ."}
+                            image={isOrderComplete ? "/img/complete-order.jpg" : "/img/empty-cart.jpg" }/>
+                    // <div className="cartEmpty d-flex align-center justify-center flex-column flex">
+                    //     <img className="mb-20" width={120} height={120} src="/img/empty-cart.jpg" alt="Empty" />
+                    //     <h2>Корзина пустая</h2>
+                    //     <p className="opacity-6">
+                    //         Добавьте хотя бы пару кроссовок, чтобы сделать заказ.
+                    //     </p>
+                    //     <button
+                    //         onClick={onClose}
+                    //         className="greenButton">
+                    //         <img src="/img/arrow-right.svg" alt="Arrow" />
+                    //         Вернуться назад
+                    //     </button>
+                    // </div>
                 }
 
             </div>
