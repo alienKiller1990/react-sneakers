@@ -5,6 +5,7 @@ import Drawer from "./component/Drawer";
 import Header from "./component/Header";
 import Favorites from "./pages/Favorites";
 import Home from "./pages/Home";
+import Orders from "./pages/Orders";
 
 export const AppContext = React.createContext({});
 
@@ -85,14 +86,24 @@ function App() {
   }
 
   return (
-    <AppContext.Provider value={{ items, favorites, cartItems, isItemsAdded, onAddToFavorite, setCartOpened, setCartItems }}>
+    <AppContext.Provider
+      value={{
+        items,
+        favorites,
+        cartItems,
+        isItemsAdded,
+        onAddToFavorite,
+        setCartOpened,
+        setCartItems,
+        onAddToCart
+      }}>
       <div className="wrapper clear">
-        {
-          cartOpened && <Drawer //если "cartOpened" === true, то произвести рендер корзины
+          <Drawer
             onRemove={omRemoveItem}
             onClose={() => setCartOpened(false)}
-            items={cartItems} />
-        }
+            items={cartItems}
+            opened={cartOpened}
+          />
         <Header onClickCart={() => setCartOpened(true)} />
 
         <Route path="/" exact>
@@ -108,7 +119,11 @@ function App() {
           />
         </Route>
         <Route path="/favorites" exact>
-          <Favorites/>
+          <Favorites />
+        </Route>
+
+        <Route path="/orders" exact>
+          <Orders />
         </Route>
 
 
