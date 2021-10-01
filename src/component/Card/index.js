@@ -4,19 +4,29 @@ import ContentLoader from "react-content-loader"
 import { AppContext } from '../../App'
 
 
-function Card({ id, title, price, imgUrl, onPlus, onFavorite, favorited = false, loading = false }) {
+function Card({
+    id,
+    title,
+    price,
+    imgUrl,
+    onPlus,
+    onFavorite,
+    favorited = false,
+    loading = false
+}) {
 
     const { isItemsAdded } = React.useContext(AppContext);
     // const [isAdded, setIsAdded] = React.useState(added); // хук для смены иконки добавить в корзину / убрать из корзины
     const [isFavorite, setIsFavorite] = React.useState(favorited) // хук для смены иконки добавить в ибранное / убрать
+    const obj = { id, parentId: id, title, imgUrl, price }
 
     const onClickPlus = () => { // при клике на "img" запускаем "onPlus" из пропсов, и хук "setIsAdded" 
-        onPlus({ id, title, price, imgUrl }) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
+        onPlus(obj) // вспомогательная функция для хука, для смены иконки добавить в корзину / убрать из корзины
         // setIsAdded(!isAdded)
     }
 
     const onClickFavorite = () => {
-        onFavorite({ id, title, price, imgUrl })
+        onFavorite(obj)
         setIsFavorite(!isFavorite)
     }
 

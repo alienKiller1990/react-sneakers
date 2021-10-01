@@ -26,33 +26,42 @@ function App() {
   React.useEffect(() => { // оборачиваем запрос хуком "useEffect", чтобы рендер произошел только один раз, при первой загрузке страницы
 
     async function fetchData() {
-      setIsLoading(true)
-      const cartResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/cart');
-      const favoritesResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites'); // запрашиваем "cart" с сервера и рендерим корзину
-      const itemsResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/items');
+      try {
+        const [cartResponse, favoritesResponse, itemsResponse] = await Promise.all([
+          axios.get('https://6147374665467e0017384aa5.mockapi.io/cart'),
+          axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites'),
+          axios.get('https://6147374665467e0017384aa5.mockapi.io/items')
+        ])
+        // const cartResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/cart');
+        // const favoritesResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/favorites'); // запрашиваем "cart" с сервера и рендерим корзину
+        // const itemsResponse = await axios.get('https://6147374665467e0017384aa5.mockapi.io/items');
 
-      setIsLoading(false)
-      setCartItems(cartResponse.data);
-      setFavorites(favoritesResponse.data);
-      setItems(itemsResponse.data);
+        setIsLoading(false)
+        setCartItems(cartResponse.data);
+        setFavorites(favoritesResponse.data);
+        setItems(itemsResponse.data);
+      } catch (error) {
+        alert("Ошибка при запросе данных")
+      }
     }
 
     fetchData()
 
   }, []);
 
-  const onAddToCart = (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
+  const onAddToCart = async (obj) => { // когда произойдет клик в "Card", хук "setCartItems" запушит в массив новый "obj"
     try {
-      if (cartItems.find(item => Number(item.id) === Number(obj.id))) {// если в "cartItems" есть хотя бы один "item" имеет такой "id", который был при нажатии на кнопку "plus", то удалить продукт
-        axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${obj.id}`)
-        setCartItems(prev => prev.filter(item => Number(item.id) !== Number(obj.id)))
+      const findItem = cartItems.find(item => Number(item.parentId) === Number(obj.id))
+      if (findItem) {// если в "cartItems" есть хотя бы один "item" имеет такой "id", который был при нажатии на кнопку "plus", то удалить продукт
+        setCartItems(prev => prev.filter(item => Number(item.parentId) !== Number(obj.id)))
+        await axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${findItem.id}`)
       } else {
-        axios.post('https://6147374665467e0017384aa5.mockapi.io/cart', obj) // при добавлении товара в корзину отправить "obj" на сервер
-        setCartItems(prev => [...prev, obj])
+        const {data} = await axios.post('https://6147374665467e0017384aa5.mockapi.io/cart', obj) // при добавлении товара в корзину отправить "obj" на сервер
+        setCartItems(prev => [...prev, data])
 
       }
     } catch (error) {
-
+      alert('Ошибка при добавлении в корзину')
     }
 
 
@@ -73,8 +82,12 @@ function App() {
   }
 
   const omRemoveItem = (id) => {
-    axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${id}`) // при удалении товара , удалить с сервера
-    setCartItems(prev => prev.filter(item => item.id !== id))
+    try {
+      axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${id}`) // при удалении товара , удалить с сервера
+      setCartItems(prev => prev.filter(item => item.id !== id))
+    } catch (error) {
+      alert('Ошибка при удалении из корзины')
+    }
   }
 
   const onChangeSearchInput = (event) => { // елси input изменится, отловить событие, и обновить state
@@ -82,7 +95,7 @@ function App() {
   }
 
   const isItemsAdded = (id) => {
-    return cartItems.some(obj => Number(obj.id) === Number(id))
+    return cartItems.some(obj => Number(obj.parentId) === Number(id))
   }
 
   return (
@@ -98,12 +111,12 @@ function App() {
         onAddToCart
       }}>
       <div className="wrapper clear">
-          <Drawer
-            onRemove={omRemoveItem}
-            onClose={() => setCartOpened(false)}
-            items={cartItems}
-            opened={cartOpened}
-          />
+        <Drawer
+          onRemove={omRemoveItem}
+          onClose={() => setCartOpened(false)}
+          items={cartItems}
+          opened={cartOpened}
+        />
         <Header onClickCart={() => setCartOpened(true)} />
 
         <Route path="/" exact>
