@@ -56,8 +56,17 @@ function App() {
         setCartItems(prev => prev.filter(item => Number(item.parentId) !== Number(obj.id)))
         await axios.delete(`https://6147374665467e0017384aa5.mockapi.io/cart/${findItem.id}`)
       } else {
+        setCartItems(prev => [...prev, obj])
         const {data} = await axios.post('https://6147374665467e0017384aa5.mockapi.io/cart', obj) // при добавлении товара в корзину отправить "obj" на сервер
-        setCartItems(prev => [...prev, data])
+        setCartItems(prev => prev.map(item => {
+          if (item.parentId === data.parentId) {
+            return {
+              ...item,
+              id: data.id
+            }
+          }
+          return item
+        }))
 
       }
     } catch (error) {
